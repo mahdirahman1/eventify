@@ -10,6 +10,8 @@ export default gql`
 	type Mutation {
 		createEvent(event: EventInput): Event!
 		createUser(user: UserInput): User!
+		joinEvent(eventId: ID!): Event!
+		leaveEvent(eventId: ID!): Event!
 	}
 
 	input UserInput {
@@ -21,6 +23,7 @@ export default gql`
 		_id: ID!
 		email: String!
 		password: String
+		hostedEvents: [Event!]
 	}
 
 	input EventInput {
@@ -36,5 +39,7 @@ export default gql`
 		description: String!
 		date: String!
 		category: String!
+		host: User!
+		participants: [User!]
 	}
 `;

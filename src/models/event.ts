@@ -21,6 +21,12 @@ const eventsSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: "User",
 	},
+	participants: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "User",
+		},
+	],
 });
 
 export default mongoose.model("Event", eventsSchema);
