@@ -1,4 +1,6 @@
 import bcrypt from "bcryptjs";
+import graphqlFields from "graphql-fields";
+import jwt from "jsonwebtoken";
 import Event from "../models/event";
 import User from "../models/user";
 
@@ -26,7 +28,10 @@ const resolvers = {
 				throw err;
 			}
 		},
-		event: async (_: any, { id }: any) => {
+		event: async (_: any, { id }: any, context: any) => {
+			if(!context.isAuth){
+				throw new Error("Unauthenticated");
+			}
 			try {
 				const events = await Event.find({ _id: id })
 					.populate({
@@ -47,8 +52,10 @@ const resolvers = {
 				throw err;
 			}
 		},
-		user: async (_: any, { id }: any) => {
-			//return users.filter((user) => user._id == id)[0];
+		user: async (_: any, { id }: any, context: any) => {
+			if(!context.isAuth){
+				throw new Error("Unauthenticated");
+			}
 			try {
 				let user = await User.findById(id).populate({ path: "hostedEvents" });
 				return { ...user._doc, _id: user._doc._id.toString() };
@@ -57,18 +64,42 @@ const resolvers = {
 				throw err;
 			}
 		},
+		login: async (_: any, { email, password }: any) => {
+			try {
+				let user = await User.findOne({ email });
+				if (!user) {
+					throw new Error("User does not exist");
+				}
+				const authenticated = await bcrypt.compare(password, user.password);
+				if (!authenticated) {
+					throw new Error("Invalid validation");
+				}
+				const token = await jwt.sign(
+					{ userId: user.id, email: user.email },
+					"secret-shak",
+					{ expiresIn: "1h" }
+				);
+				return { userId: user.id, token, tokenExp: 1 };
+			} catch (err) {
+				console.log(err);
+				throw err;
+			}
+		},
 	},
 
 	Mutation: {
-		createEvent: async (_: any, { event }: any, ___: any) => {
+		createEvent: async (_: any, { event }: any, {isAuth, userId}: any, info: any) => {
+			if(!isAuth){
+				throw new Error("Unauthenticated");
+			}
 			try {
 				const newEvent = new Event({
 					...event,
 					date: new Date(event.date).toISOString(),
-					host: "625703b9a5b2b7b1ae9b3e79",
+					host: userId,
 				});
 				let status = await newEvent.save();
-				const user = await User.findById("625703b9a5b2b7b1ae9b3e79");
+				const user = await User.findById(userId);
 				user.hostedEvents.push(newEvent);
 				await user.save();
 				status = await status.populate("host");
@@ -100,10 +131,13 @@ const resolvers = {
 				throw err;
 			}
 		},
-		joinEvent: async (_: any, { eventId }: any, ___: any) => {
+		joinEvent: async (_: any, { eventId }: any, {isAuth, userId}: any) => {
+			if(!isAuth){
+				throw new Error("Unauthenticated");
+			}
 			try {
 				let event = await Event.findById(eventId);
-				event.participants.push("62574032c895edab69477843");
+				event.participants.push(userId);
 				await event.save();
 				event = await event.populate("host");
 				event = await event.populate("participants");
@@ -113,13 +147,16 @@ const resolvers = {
 				throw err;
 			}
 		},
-		leaveEvent: async (_: any, { eventId }: any, ___: any) => {
+		leaveEvent: async (_: any, { eventId }: any, {isAuth, userId}: any) => {
+			if(!isAuth){
+				throw new Error("Unauthenticated");
+			}
 			try {
 				await Event.updateOne(
 					{ _id: eventId },
 					{
 						$pull: {
-							"participants":  "62574032c895edab69477843",
+							participants: userId,
 						},
 					}
 				);

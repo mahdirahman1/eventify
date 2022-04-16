@@ -4,8 +4,10 @@ import express from "express";
 import typeDefs from "./graphql/schema";
 import resolvers from "./graphql/resolvers";
 import mongoose from "mongoose";
+import authMiddleware from "./middleware/is-auth";
 
 const app = express();
+
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${
 	process.env.MONGO_PASS
 }@cluster0.2rle2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -20,12 +22,22 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
+		context: async ({ req, res }: any) => {
+			const isAuth = req.isAuth;
+			const userId = req.userId;
+
+			return {
+				isAuth,
+				userId,
+			};
+		},
 	});
 
 	await server.start();
 	server.applyMiddleware({ app });
 }
 
+app.use(authMiddleware);
 startApolloServer(typeDefs, resolvers);
 
 mongoose
