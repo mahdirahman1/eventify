@@ -16,6 +16,7 @@ import {
 import { useQuery, gql, useLazyQuery } from "@apollo/client";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const LOGIN_USER = gql`
 	query Query($email: String!, $password: String) {
@@ -28,12 +29,15 @@ const LOGIN_USER = gql`
 
 const Login = () => {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 	const emailRef: any = useRef();
 	const passRef: any = useRef();
 
 	interface opvars {
-		email: string;
-		password: string;
+		login : {
+			token: string,
+			userId: string,
+		}
 	}
 
 	const [login, { loading, error, data }] = useLazyQuery<opvars>(LOGIN_USER);
@@ -41,10 +45,12 @@ const Login = () => {
 	useEffect(
 		() => {
 			if (data && !loading) {
+				console.log(data);
+				dispatch({ type: "LOGIN_USER", payload: {token: data.login.token, userId: data.login.userId} });
 				navigate("/events")
 			}
 		},
-		[data, loading, navigate]
+		[data, dispatch, loading, navigate]
 	);
 
 	return (
