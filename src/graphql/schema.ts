@@ -5,7 +5,7 @@ export default gql`
 		events: [Event!]!
 		event(id: ID!): Event!
 		user(id: ID!): User!
-		login(email: String!, password: String): AuthData!
+		login(username: String!, password: String): AuthData!
 	}
 
 	type Mutation {
@@ -22,13 +22,15 @@ export default gql`
 	}
 
 	input UserInput {
-		email: String!
+		username: String!
+		name: String!
 		password: String!
 	}
 
 	type User {
 		_id: ID!
-		email: String!
+		name: String!
+		username: String!
 		password: String
 		hostedEvents: [Event!]
 	}

@@ -64,9 +64,9 @@ const resolvers = {
 				throw err;
 			}
 		},
-		login: async (_: any, { email, password }: any) => {
+		login: async (_: any, { username, password }: any) => {
 			try {
-				let user = await User.findOne({ email });
+				let user = await User.findOne({ username });
 				if (!user) {
 					throw new Error("User does not exist");
 				}
@@ -111,13 +111,14 @@ const resolvers = {
 		},
 		createUser: async (_: any, { user }: any, ___: any) => {
 			try {
-				const findUser = await User.findOne({ email: user.email });
+				const findUser = await User.findOne({ username: user.username });
 				if (findUser) {
 					throw new Error("User already exists");
 				}
 				const hashedPass = await bcrypt.hash(user.password, 12);
 				const newUser = new User({
-					email: user.email,
+					username: user.username,
+					name: user.name,
 					password: hashedPass,
 				});
 				const result = await newUser.save();
