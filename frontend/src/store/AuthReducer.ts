@@ -1,8 +1,9 @@
 import { AnyAction } from "redux";
 
 const initialState = {
-	userId: "",
-	token: "",
+	userId: null,
+	token: null,
+	tokenExp: null,
 };
 
 const AuthReducer = (state = initialState, action: AnyAction) => {

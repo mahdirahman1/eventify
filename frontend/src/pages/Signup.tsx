@@ -13,14 +13,97 @@ import {
 	Text,
 	useColorModeValue,
 	Link,
+	FormErrorMessage,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { gql, useMutation } from "@apollo/client";
+
+const CREATE_USER = gql`
+	mutation Mutation($user: UserInput) {
+		createUser(user: $user) {
+			_id
+			token
+			tokenExp
+		}
+	}
+`;
 
 const Signup = () => {
-	const [showPassword, setShowPassword] = useState(false);
+	const [showPassword, setShowPassword] = useState<Boolean>(false);
+	const [error, setError] = useState<null | string>(null);
+	const [formErrors, setFormErrors] = useState({
+		name: false,
+		username: false,
+		password: false,
+	});
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const userRef: any = useRef();
+	const passRef: any = useRef();
+	const nameRef: any = useRef();
+	let [addUser, { loading, reset }] = useMutation(CREATE_USER, {
+		onCompleted: (data) => {
+			dispatch({ type: "LOGIN_USER", payload: {token: data.createUser.token, tokenExp: data.createUser.tokenExp, userId: data.createUser.userId} });
+			navigate("/events");
+			reset();
+		},
+		onError: (err) => {
+			reset();
+			setError(err.message);
+		},
+	});
+
+	const validateName = () => {
+		if (nameRef.current.value === "") {
+			setFormErrors({ ...formErrors, name: true });
+		} else {
+			setFormErrors({ ...formErrors, name: false });
+		}
+	};
+
+	const validateUsername = () => {
+		setError(null);
+		if (userRef.current.value === "") {
+			setFormErrors({ ...formErrors, username: true });
+		} else {
+			setFormErrors({ ...formErrors, username: false });
+		}
+	};
+
+	const validatePass = () => {
+		if (passRef.current.value === "") {
+			setFormErrors({ ...formErrors, password: true });
+		} else {
+			setFormErrors({ ...formErrors, password: false });
+		}
+	};
+
+	const createUser = async () => {
+		const updatedErrors = {
+			name: false,
+			username: false,
+			password: false,
+		};
+		if (passRef.current.value === "") updatedErrors.password = true;
+		if (userRef.current.value === "") updatedErrors.username = true;
+		if (nameRef.current.value === "") updatedErrors.name = true;
+		setFormErrors(updatedErrors);
+		if (updatedErrors.name || updatedErrors.username || updatedErrors.password)
+			return;
+
+		await addUser({
+			variables: {
+				user: {
+					username: userRef.current.value,
+					name: nameRef.current.value,
+					password: passRef.current.value,
+				},
+			},
+		});
+	};
 
 	return (
 		<Flex
@@ -50,20 +133,40 @@ const Signup = () => {
 					bg={useColorModeValue("white", "gray.700")}
 					boxShadow={"lg"}
 					p={8}
+					border={error ? "2px solid red" : ''}
 				>
 					<Stack spacing={3}>
-						<FormControl id="username" isRequired>
+						<FormControl id="name" isRequired isInvalid={formErrors.name}>
+							<FormLabel>Name</FormLabel>
+							<Input ref={nameRef} type="text" onChange={validateName} />
+
+							{formErrors.name && (
+								<FormErrorMessage>Email is required.</FormErrorMessage>
+							)}
+						</FormControl>
+						<FormControl
+							id="username"
+							isRequired
+							isInvalid={formErrors.username}
+						>
 							<FormLabel>Username</FormLabel>
-							<Input type="text" />
+							<Input ref={userRef} type="text" onChange={validateUsername} />
+							{formErrors.username && (
+								<FormErrorMessage>Username is required.</FormErrorMessage>
+							)}
 						</FormControl>
-						<FormControl id="email" isRequired>
-							<FormLabel>Email address</FormLabel>
-							<Input type="email" />
-						</FormControl>
-						<FormControl id="password" isRequired>
+						<FormControl
+							id="password"
+							isRequired
+							isInvalid={formErrors.password}
+						>
 							<FormLabel>Password</FormLabel>
 							<InputGroup>
-								<Input type={showPassword ? "text" : "password"} />
+								<Input
+									type={showPassword ? "text" : "password"}
+									ref={passRef}
+									onChange={validatePass}
+								/>
 								<InputRightElement h={"full"}>
 									<Button
 										variant={"ghost"}
@@ -75,20 +178,32 @@ const Signup = () => {
 									</Button>
 								</InputRightElement>
 							</InputGroup>
+							{formErrors.password && (
+								<FormErrorMessage>Password is required.</FormErrorMessage>
+							)}
 						</FormControl>
-						<Stack spacing={10} pt={2}>
+
+						<FormControl isInvalid={error ? true : false}>
 							<Button
 								loadingText="Submitting"
+								isLoading={loading}
+								w="100%"
 								size="lg"
 								bg={"blue.400"}
 								color={"white"}
 								_hover={{
 									bg: "blue.500",
 								}}
+								type="submit"
+								onClick={createUser}
 							>
 								Sign up
 							</Button>
-						</Stack>
+							<FormErrorMessage justifyContent="center">
+								{error}
+							</FormErrorMessage>
+						</FormControl>
+
 						<Stack pt={6}>
 							<Text align={"center"}>
 								Already a user?{" "}

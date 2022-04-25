@@ -19,10 +19,11 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 const LOGIN_USER = gql`
-	query Query($email: String!, $password: String) {
-		login(email: $email, password: $password) {
+	query Query($username: String!, $password: String) {
+		login(username: $username, password: $password) {
 			userId
 			token
+			tokenExp
 		}
 	}
 `;
@@ -30,13 +31,14 @@ const LOGIN_USER = gql`
 const Login = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const emailRef: any = useRef();
+	const userRef: any = useRef();
 	const passRef: any = useRef();
 
 	interface opvars {
 		login : {
 			token: string,
 			userId: string,
+			tokenExp: string,
 		}
 	}
 
@@ -46,7 +48,7 @@ const Login = () => {
 		() => {
 			if (data && !loading) {
 				console.log(data);
-				dispatch({ type: "LOGIN_USER", payload: {token: data.login.token, userId: data.login.userId} });
+				dispatch({ type: "LOGIN_USER", payload: {token: data.login.token, tokenExp: data.login.tokenExp, userId: data.login.userId} });
 				navigate("/events")
 			}
 		},
@@ -79,9 +81,9 @@ const Login = () => {
 					border={error ? "2px solid red" : ''}
 				>
 					<Stack spacing={4}>
-						<FormControl id="email">
+						<FormControl id="username">
 							<FormLabel>Username</FormLabel>
-							<Input type="text" ref={emailRef} isRequired />
+							<Input type="text" ref={userRef} isRequired />
 						</FormControl>
 						<FormControl id="password">
 							<FormLabel>Password</FormLabel>
@@ -95,12 +97,13 @@ const Login = () => {
 								_hover={{
 									bg: "blue.500",
 								}}
-								disabled={loading}
+								loadingText="Signing In"
+								isLoading={loading}
 								type="submit"
 								onClick={() =>
 									login({
 										variables: {
-											email: emailRef.current.value,
+											username: userRef.current.value,
 											password: passRef.current.value,
 										},
 									})

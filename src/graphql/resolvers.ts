@@ -29,7 +29,7 @@ const resolvers = {
 			}
 		},
 		event: async (_: any, { id }: any, context: any) => {
-			if(!context.isAuth){
+			if (!context.isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {
@@ -53,7 +53,7 @@ const resolvers = {
 			}
 		},
 		user: async (_: any, { id }: any, context: any) => {
-			if(!context.isAuth){
+			if (!context.isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {
@@ -75,7 +75,7 @@ const resolvers = {
 					throw new Error("Invalid validation");
 				}
 				const token = await jwt.sign(
-					{ userId: user.id, email: user.email },
+					{ userId: user.id, username: user.username },
 					"secret-shak",
 					{ expiresIn: "1h" }
 				);
@@ -88,8 +88,13 @@ const resolvers = {
 	},
 
 	Mutation: {
-		createEvent: async (_: any, { event }: any, {isAuth, userId}: any, info: any) => {
-			if(!isAuth){
+		createEvent: async (
+			_: any,
+			{ event }: any,
+			{ isAuth, userId }: any,
+			info: any
+		) => {
+			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {
@@ -113,27 +118,34 @@ const resolvers = {
 			try {
 				const findUser = await User.findOne({ username: user.username });
 				if (findUser) {
-					throw new Error("User already exists");
+					throw new Error("Username is taken, try another one");
 				}
 				const hashedPass = await bcrypt.hash(user.password, 12);
-				const newUser = new User({
+				const newUser = await new User({
 					username: user.username,
 					name: user.name,
 					password: hashedPass,
 				});
 				const result = await newUser.save();
+				const token = await jwt.sign(
+					{ userId: result._doc._id.toString(), username: user.username },
+					"secret-shak",
+					{ expiresIn: "1h" }
+				);
 				return {
 					...result._doc,
 					_id: result._doc._id.toString(),
 					password: null,
+					token,
+					tokenExp: 1,
 				};
 			} catch (err) {
 				console.log(err);
 				throw err;
 			}
 		},
-		joinEvent: async (_: any, { eventId }: any, {isAuth, userId}: any) => {
-			if(!isAuth){
+		joinEvent: async (_: any, { eventId }: any, { isAuth, userId }: any) => {
+			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {
@@ -148,8 +160,8 @@ const resolvers = {
 				throw err;
 			}
 		},
-		leaveEvent: async (_: any, { eventId }: any, {isAuth, userId}: any) => {
-			if(!isAuth){
+		leaveEvent: async (_: any, { eventId }: any, { isAuth, userId }: any) => {
+			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {

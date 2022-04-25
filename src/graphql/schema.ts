@@ -33,6 +33,8 @@ export default gql`
 		username: String!
 		password: String
 		hostedEvents: [Event!]
+		token: String
+		tokenExp: Int
 	}
 
 	input EventInput {
