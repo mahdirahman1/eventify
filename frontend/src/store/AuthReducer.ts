@@ -1,6 +1,12 @@
 import { AnyAction } from "redux";
 
-const initialState = {
+export interface authState {
+	userId: string | null;
+	token: string | null;
+	tokenExp: number | null;
+}
+
+const initialState: authState = {
 	userId: null,
 	token: null,
 	tokenExp: null,

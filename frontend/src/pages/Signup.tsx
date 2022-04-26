@@ -5,7 +5,6 @@ import {
 	FormLabel,
 	Input,
 	InputGroup,
-	HStack,
 	InputRightElement,
 	Stack,
 	Button,
@@ -15,9 +14,9 @@ import {
 	Link,
 	FormErrorMessage,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { Navigate, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
 
@@ -46,13 +45,20 @@ const Signup = () => {
 	const nameRef: any = useRef();
 	let [addUser, { loading, reset }] = useMutation(CREATE_USER, {
 		onCompleted: (data) => {
-			dispatch({ type: "LOGIN_USER", payload: {token: data.createUser.token, tokenExp: data.createUser.tokenExp, userId: data.createUser.userId} });
-			navigate("/events");
+			dispatch({
+				type: "LOGIN_USER",
+				payload: {
+					token: data.createUser.token,
+					tokenExp: data.createUser.tokenExp,
+					userId: data.createUser.userId,
+				},
+			});
+			navigate("/events", { replace: true });
 			reset();
 		},
 		onError: (err) => {
-			reset();
 			setError(err.message);
+			reset();
 		},
 	});
 
@@ -133,7 +139,7 @@ const Signup = () => {
 					bg={useColorModeValue("white", "gray.700")}
 					boxShadow={"lg"}
 					p={8}
-					border={error ? "2px solid red" : ''}
+					border={error ? "2px solid red" : ""}
 				>
 					<Stack spacing={3}>
 						<FormControl id="name" isRequired isInvalid={formErrors.name}>
