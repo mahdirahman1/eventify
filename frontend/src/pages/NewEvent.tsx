@@ -35,8 +35,27 @@ const NewEvent = () => {
 		titleRef.current.value = "";
 		dateTimeRef.current.value = "";
 		descRef.current.value = "";
+		setFieldErrors({
+			title: false,
+			category: false,
+			date: false,
+		});
 	};
-	const createEventHandler = () => {};
+	const createEventHandler = () => {
+		const updatedErrors = {
+			title: false,
+			category: false,
+			date: false,
+		};
+		if (titleRef.current.value === "") updatedErrors.title = true;
+		if (catRef.current.value === "") updatedErrors.category = true;
+		if (dateTimeRef.current.value === "") updatedErrors.date = true;
+		setFieldErrors(updatedErrors);
+		if (updatedErrors.date || updatedErrors.title || updatedErrors.category)
+			return;
+
+        
+	};
 	return (
 		<Flex minH={"100vh"} bg={useColorModeValue("gray.100", "gray.800")}>
 			<Stack spacing={8} width={"80vw"} mx={"auto"} py={12} px={12}>
@@ -50,38 +69,88 @@ const NewEvent = () => {
 					p={8}
 				>
 					<Stack spacing={6}>
-						<FormControl id="title">
+						<FormControl id="title" isInvalid={fieldErrors.title}>
 							<FormLabel>Title</FormLabel>
-							<Input type="text" isRequired ref={titleRef} />
+							<Input
+								type="text"
+								isRequired
+								ref={titleRef}
+								onChange={() =>
+									setFieldErrors({ ...fieldErrors, title: false })
+								}
+							/>
+							{fieldErrors.title && (
+								<FormErrorMessage>Title is required.</FormErrorMessage>
+							)}
 						</FormControl>
 						{largerThan530 ? (
 							<HStack>
-								<FormControl id="category">
+								<FormControl id="category" isInvalid={fieldErrors.category}>
 									<FormLabel>Category</FormLabel>
-									<Select placeholder="Select option" ref={catRef}>
+									<Select
+										placeholder="Select option"
+										ref={catRef}
+										onChange={() =>
+											setFieldErrors({ ...fieldErrors, category: false })
+										}
+									>
 										<option value="sports">Sports</option>
 										<option value="party">Party</option>
 										<option value="miscellaneous">Miscellaneous</option>
 									</Select>
+									{fieldErrors.category && (
+										<FormErrorMessage>Category is required.</FormErrorMessage>
+									)}
 								</FormControl>
-								<FormControl id="date">
+								<FormControl id="date" isInvalid={fieldErrors.date}>
 									<FormLabel>Date & Time</FormLabel>
-									<Input type="datetime-local" ref={dateTimeRef} />
+									<Input
+										type="datetime-local"
+										ref={dateTimeRef}
+										onChange={() =>
+											setFieldErrors({ ...fieldErrors, date: false })
+										}
+									/>
+									{fieldErrors.date && (
+										<FormErrorMessage>
+											Date & Time is required.
+										</FormErrorMessage>
+									)}
 								</FormControl>
 							</HStack>
 						) : (
 							<Stack spacing={6}>
-								<FormControl id="category">
+								<FormControl id="category" isInvalid={fieldErrors.category}>
 									<FormLabel>Category</FormLabel>
-									<Select placeholder="Select option" ref={catRef}>
+									<Select
+										placeholder="Select option"
+										ref={catRef}
+										onChange={() =>
+											setFieldErrors({ ...fieldErrors, category: false })
+										}
+									>
 										<option value="sports">Sports</option>
 										<option value="party">Party</option>
 										<option value="miscellaneous">Miscellaneous</option>
 									</Select>
+									{fieldErrors.category && (
+										<FormErrorMessage>Category is required.</FormErrorMessage>
+									)}
 								</FormControl>
-								<FormControl id="date">
+								<FormControl id="date" isInvalid={fieldErrors.date}>
 									<FormLabel>Date & Time</FormLabel>
-									<Input type="datetime-local" ref={dateTimeRef} />
+									<Input
+										type="datetime-local"
+										ref={dateTimeRef}
+										onChange={() =>
+											setFieldErrors({ ...fieldErrors, date: false })
+										}
+									/>
+									{fieldErrors.date && (
+										<FormErrorMessage>
+											Date & Time is required.
+										</FormErrorMessage>
+									)}
 								</FormControl>
 							</Stack>
 						)}

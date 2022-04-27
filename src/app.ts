@@ -5,6 +5,7 @@ import typeDefs from "./graphql/schema";
 import resolvers from "./graphql/resolvers";
 import mongoose from "mongoose";
 import authMiddleware from "./middleware/is-auth";
+import cors from "cors";
 
 const app = express();
 
@@ -13,10 +14,8 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${
 }@cluster0.2rle2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
 app.use(bodyParser.json());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-app.get("/", (req, res) => {
-	res.send("Hello World!");
-});
 
 async function startApolloServer(typeDefs: any, resolvers: any) {
 	const server = new ApolloServer({
@@ -34,7 +33,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 	});
 
 	await server.start();
-	server.applyMiddleware({ app });
+	server.applyMiddleware({ app, cors: false });
 }
 
 app.use(authMiddleware);

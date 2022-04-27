@@ -47,7 +47,7 @@ export default gql`
 	type Event {
 		_id: ID!
 		title: String!
-		description: String!
+		description: String
 		date: String!
 		category: String!
 		host: User!
