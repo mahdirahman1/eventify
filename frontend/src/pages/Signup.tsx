@@ -19,6 +19,7 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import {  useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
+import { setJwtToken } from "../utils";
 
 const CREATE_USER = gql`
 	mutation Mutation($user: UserInput) {
@@ -53,6 +54,7 @@ const Signup = () => {
 					userId: data.createUser.userId,
 				},
 			});
+			setJwtToken(data.createUser.token);
 			navigate("/events", { replace: true });
 			reset();
 		},
@@ -147,7 +149,7 @@ const Signup = () => {
 							<Input ref={nameRef} type="text" onChange={validateName} />
 
 							{formErrors.name && (
-								<FormErrorMessage>Email is required.</FormErrorMessage>
+								<FormErrorMessage>Name is required.</FormErrorMessage>
 							)}
 						</FormControl>
 						<FormControl

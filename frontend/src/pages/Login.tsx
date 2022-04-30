@@ -16,6 +16,7 @@ import {  gql, useLazyQuery } from "@apollo/client";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { setJwtToken } from "../utils";
 
 const LOGIN_USER = gql`
 	query Query($username: String!, $password: String) {
@@ -48,6 +49,7 @@ const Login = () => {
 			if (data && !loading) {
 				console.log(data);
 				dispatch({ type: "LOGIN_USER", payload: {token: data.login.token, tokenExp: data.login.tokenExp, userId: data.login.userId} });
+				setJwtToken(data.login.token);
 				navigate("/events", { replace: true })
 			}
 		},
