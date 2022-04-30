@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import {
 	Flex,
 	Box,
@@ -18,8 +19,28 @@ import {
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 
+const CREATE_EVENT = gql`
+	mutation Mutation($event: EventInput) {
+		createEvent(event: $event) {
+			_id
+			title
+		}
+	}
+`;
+
 const NewEvent = () => {
+	let [createEvent, { loading, reset }] = useMutation(CREATE_EVENT, {
+		onCompleted: (data) => {
+			reset();
+            resetFields();
+		},
+		onError: (err) => {
+			setReqError(err.message);
+            reset();
+		},
+	});
 	const [largerThan530] = useMediaQuery("(min-width: 531px)");
+	const [requestError, setReqError] = useState<null | string>(null);
 	const [fieldErrors, setFieldErrors] = useState({
 		title: false,
 		category: false,
@@ -40,8 +61,9 @@ const NewEvent = () => {
 			category: false,
 			date: false,
 		});
+        setReqError(null);
 	};
-	const createEventHandler = () => {
+	const createEventHandler = async () => {
 		const updatedErrors = {
 			title: false,
 			category: false,
@@ -54,7 +76,20 @@ const NewEvent = () => {
 		if (updatedErrors.date || updatedErrors.title || updatedErrors.category)
 			return;
 
-        
+		console.log(dateTimeRef.current.value);
+		const event = {
+			title: titleRef.current.value,
+			date: dateTimeRef.current.value,
+			category: catRef.current.value,
+			description: descRef.current.value,
+		};
+		await createEvent({
+			variables: {
+				event,
+			},
+		});
+
+		//console.log(data);
 	};
 	return (
 		<Flex minH={"100vh"} bg={useColorModeValue("gray.100", "gray.800")}>
@@ -67,6 +102,7 @@ const NewEvent = () => {
 					boxShadow={"lg"}
 					width={"100%"}
 					p={8}
+                    border={requestError ? "2px solid red" : ''}
 				>
 					<Stack spacing={6}>
 						<FormControl id="title" isInvalid={fieldErrors.title}>
@@ -159,7 +195,7 @@ const NewEvent = () => {
 							<Textarea ref={descRef} />
 						</FormControl>
 
-						<FormControl isInvalid>
+						<FormControl isInvalid={requestError ? true : false}>
 							<HStack>
 								<Button w="50%" onClick={resetFields}>
 									Reset
@@ -171,13 +207,17 @@ const NewEvent = () => {
 									_hover={{
 										bg: "teal.500",
 									}}
-									loadingText="Signing In"
+									loadingText="Creating"
 									type="submit"
+									isLoading={loading}
 									onClick={createEventHandler}
 								>
 									Create
 								</Button>
 							</HStack>
+							<FormErrorMessage justifyContent="center">
+								{requestError}
+							</FormErrorMessage>
 						</FormControl>
 					</Stack>
 				</Box>

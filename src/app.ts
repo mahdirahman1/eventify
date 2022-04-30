@@ -14,8 +14,6 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${
 }@cluster0.2rle2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
 app.use(bodyParser.json());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-
 
 async function startApolloServer(typeDefs: any, resolvers: any) {
 	const server = new ApolloServer({
@@ -33,7 +31,13 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 	});
 
 	await server.start();
-	server.applyMiddleware({ app, cors: false });
+	server.applyMiddleware({
+		app,
+		cors: {
+			origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+			credentials: true,
+		},
+	});
 }
 
 app.use(authMiddleware);
