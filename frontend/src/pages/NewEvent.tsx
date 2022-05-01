@@ -6,10 +6,8 @@ import {
 	FormLabel,
 	Input,
 	Stack,
-	Link,
 	Button,
 	Heading,
-	Text,
 	useColorModeValue,
 	FormErrorMessage,
 	Textarea,
@@ -32,11 +30,11 @@ const NewEvent = () => {
 	let [createEvent, { loading, reset }] = useMutation(CREATE_EVENT, {
 		onCompleted: (data) => {
 			reset();
-            resetFields();
+			resetFields();
 		},
 		onError: (err) => {
 			setReqError(err.message);
-            reset();
+			reset();
 		},
 	});
 	const [largerThan530] = useMediaQuery("(min-width: 531px)");
@@ -61,7 +59,7 @@ const NewEvent = () => {
 			category: false,
 			date: false,
 		});
-        setReqError(null);
+		setReqError(null);
 	};
 	const createEventHandler = async () => {
 		const updatedErrors = {
@@ -76,11 +74,13 @@ const NewEvent = () => {
 		if (updatedErrors.date || updatedErrors.title || updatedErrors.category)
 			return;
 
-		console.log(dateTimeRef.current.value);
 		const event = {
 			title: titleRef.current.value,
 			date: dateTimeRef.current.value,
-			category: catRef.current.value,
+			category:
+				catRef.current.value === "miscellaneous"
+					? "Misc"
+					: catRef.current.value,
 			description: descRef.current.value,
 		};
 		await createEvent({
@@ -102,7 +102,7 @@ const NewEvent = () => {
 					boxShadow={"lg"}
 					width={"100%"}
 					p={8}
-                    border={requestError ? "2px solid red" : ''}
+					border={requestError ? "2px solid red" : ""}
 				>
 					<Stack spacing={6}>
 						<FormControl id="title" isInvalid={fieldErrors.title}>
