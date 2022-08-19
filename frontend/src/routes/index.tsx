@@ -12,11 +12,11 @@ const createRoutes = () => {
 	return (
 		<Routes>
 			<Route path="/" element={<ProtectedRoute />}>
-                <Route path="/create" element={<NewEvent />} />
-                <Route path="/my-events" element={<MyEvents />} />
-                <Route path="/settings" element={<Settings />} />
+				<Route path="/create" element={<NewEvent />} />
+				<Route path="/my-events" element={<MyEvents />} />
+				<Route path="/settings" element={<Settings />} />
 			</Route>
-            <Route path="/events" element={<Events />} />
+			<Route path="/events" element={<Events />} />
 			<Route path="/login" element={<Login />} />
 			<Route path="/signup" element={<Signup />} />
 		</Routes>

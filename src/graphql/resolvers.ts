@@ -57,8 +57,17 @@ const resolvers = {
 				throw new Error("Unauthenticated");
 			}
 			try {
-				let user = await User.findById(id).populate({ path: "hostedEvents" });
-				return { ...user._doc, _id: user._doc._id.toString() };
+				let user = await User.findById(id).populate({
+					path: "hostedEvents",
+					populate: { path: "host" },
+				});
+				const hostedEvents = user._doc.hostedEvents.map(
+					(event: { _doc: any; date: string | number | Date }) => {
+						return { ...event._doc, date: new Date(event.date).toISOString() };
+					}
+				);
+				
+				return { ...user._doc, _id: user._doc._id.toString(), hostedEvents };
 			} catch (err) {
 				console.log(err);
 				throw err;

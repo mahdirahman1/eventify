@@ -13,6 +13,7 @@ const ALL_EVENTS = gql`
 			date
 			category
 			host {
+				_id
 				name
 			}
 			participants {

@@ -1,8 +1,23 @@
-import { StarIcon } from "@chakra-ui/icons";
-import { Badge, Box, Button, useColorModeValue } from "@chakra-ui/react";
+import { EditIcon, DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
+import {
+	Badge,
+	Box,
+	Button,
+	IconButton,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
+	useColorModeValue,
+} from "@chakra-ui/react";
 import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
-const Card = ({ eventInfo }: any) => {
+const Card = ({ eventInfo, edit }: any) => {
+	const userId: String | null = useSelector(
+		(state: RootState) => state.Auth.userId
+	);
 	const { category, title, participants, host, date } = eventInfo;
 	const formattedDate = new Date(date);
 
@@ -57,10 +72,40 @@ const Card = ({ eventInfo }: any) => {
 					fontSize="sm"
 				>
 					{`Hosted by ${host.name}`}
+				</Box>
+				<Box
+					display="flex"
+					alignItems="center"
+					justifyContent={"space-between"}
+					flexWrap={"wrap"}
+					fontSize="sm"
+				>
 					<Box color="gray.600" fontSize="sm">
 						{`${participants.length} participants`}
 					</Box>
 				</Box>
+				{edit && (
+					<Box
+						display="flex"
+						alignItems="right"
+						justifyContent={"right"}
+						flexWrap={"wrap"}
+						fontSize="sm"
+					>
+						<Menu>
+							<MenuButton
+								as={IconButton}
+								aria-label="Options"
+								icon={<HamburgerIcon />}
+								variant="outline"
+							/>
+							<MenuList>
+								<MenuItem icon={<EditIcon />}>Edit</MenuItem>
+								<MenuItem icon={<DeleteIcon />}>Delete</MenuItem>
+							</MenuList>
+						</Menu>
+					</Box>
+				)}
 			</Box>
 		</Box>
 	);
