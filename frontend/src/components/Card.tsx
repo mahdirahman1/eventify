@@ -10,16 +10,12 @@ import {
 	MenuList,
 	useColorModeValue,
 } from "@chakra-ui/react";
-import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { useNavigate } from "react-router-dom";
 
 const Card = ({ eventInfo, edit }: any) => {
-	const userId: String | null = useSelector(
-		(state: RootState) => state.Auth.userId
-	);
-	const { category, title, participants, host, date } = eventInfo;
+	const { _id: id, category, title, participants, host, date } = eventInfo;
 	const formattedDate = new Date(date);
+	const navigate = useNavigate();
 
 	return (
 		<Box
@@ -29,6 +25,7 @@ const Card = ({ eventInfo, edit }: any) => {
 			overflow="hidden"
 			bg={useColorModeValue("white", "gray.700")}
 			cursor="pointer"
+			onClick={() => navigate(`/events/${id}`)}
 		>
 			<Box p="6">
 				<Box

@@ -66,7 +66,7 @@ const resolvers = {
 						return { ...event._doc, date: new Date(event.date).toISOString() };
 					}
 				);
-				
+
 				return { ...user._doc, _id: user._doc._id.toString(), hostedEvents };
 			} catch (err) {
 				console.log(err);
@@ -163,7 +163,11 @@ const resolvers = {
 				await event.save();
 				event = await event.populate("host");
 				event = await event.populate("participants");
-				return { ...event._doc, _id: event._doc._id.toString() };
+				return {
+					...event._doc,
+					_id: event._doc._id.toString(),
+					date: new Date(event._doc.date).toISOString(),
+				};
 			} catch (err) {
 				console.log(err);
 				throw err;
@@ -185,7 +189,11 @@ const resolvers = {
 				let event = await Event.findById(eventId);
 				event = await event.populate("host");
 				event = await event.populate("participants");
-				return { ...event._doc, _id: event._doc._id.toString() };
+				return {
+					...event._doc,
+					_id: event._doc._id.toString(),
+					date: new Date(event._doc.date).toISOString(),
+				};
 			} catch (err) {
 				console.log(err);
 				throw err;

@@ -2,6 +2,8 @@ import { gql, useLazyQuery } from '@apollo/client';
 import { Box, Heading, SimpleGrid } from '@chakra-ui/react';
 import React, { useEffect } from 'react';
 import Card from '../components/Card';
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 const USER_EVENTS = gql`
 	query User($userId: ID!) {
@@ -24,8 +26,11 @@ const USER_EVENTS = gql`
 `
 
 const MyEvents = () => {
-	const [getUserEvents, { loading, error, data }] = useLazyQuery<any>(USER_EVENTS, {
-		variables: {userId: "6266e490cf0708a9b7e05add"}
+	const userId: String | null = useSelector(
+		(state: RootState) => state.Auth.userId
+	);
+	const [getUserEvents, { loading, data }] = useLazyQuery<any>(USER_EVENTS, {
+		variables: {userId}
 	});
 
 	useEffect(() => {

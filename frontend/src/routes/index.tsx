@@ -7,6 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import NewEvent from "../pages/NewEvent";
 import MyEvents from "../pages/MyEvents";
 import Settings from "../pages/Settings";
+import Event from "../pages/Event";
 
 const createRoutes = () => {
 	return (
@@ -15,6 +16,7 @@ const createRoutes = () => {
 				<Route path="/create" element={<NewEvent />} />
 				<Route path="/my-events" element={<MyEvents />} />
 				<Route path="/settings" element={<Settings />} />
+				<Route path="/events/:id" element={<Event />} />
 			</Route>
 			<Route path="/events" element={<Events />} />
 			<Route path="/login" element={<Login />} />
