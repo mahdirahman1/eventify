@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
-import graphqlFields from "graphql-fields";
-import jwt from "jsonwebtoken";
 import Event from "../models/event";
 import User from "../models/user";
+import { createAccessToken, createRefreshToken } from "./auth";
+import { CustomContext } from "./context";
 
 const resolvers = {
 	Query: {
@@ -28,8 +28,9 @@ const resolvers = {
 				throw err;
 			}
 		},
-		event: async (_: any, { id }: any, context: any) => {
-			if (!context.isAuth) {
+		event: async (_: any, { id }: any, { req }: any) => {
+			const { isAuth } = req;
+			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {
@@ -52,8 +53,9 @@ const resolvers = {
 				throw err;
 			}
 		},
-		user: async (_: any, { id }: any, context: any) => {
-			if (!context.isAuth) {
+		user: async (_: any, { id }: any, { req }: any) => {
+			const { isAuth } = req;
+			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
 			try {
@@ -73,7 +75,11 @@ const resolvers = {
 				throw err;
 			}
 		},
-		login: async (_: any, { username, password }: any) => {
+		login: async (
+			_: any,
+			{ username, password }: any,
+			{ res }: CustomContext
+		) => {
 			try {
 				let user = await User.findOne({ username });
 				if (!user) {
@@ -83,11 +89,12 @@ const resolvers = {
 				if (!authenticated) {
 					throw new Error("Invalid validation");
 				}
-				const token = await jwt.sign(
-					{ userId: user.id, username: user.username },
-					"secret-shak",
-					{ expiresIn: "1h" }
-				);
+				const token = createAccessToken(user);
+
+				res.cookie("jid", createRefreshToken(user), {
+					httpOnly: true,
+				});
+
 				return { userId: user.id, token, tokenExp: 1 };
 			} catch (err) {
 				console.log(err);
@@ -97,12 +104,8 @@ const resolvers = {
 	},
 
 	Mutation: {
-		createEvent: async (
-			_: any,
-			{ event }: any,
-			{ isAuth, userId }: any,
-			info: any
-		) => {
+		createEvent: async (_: any, { event }: any, { req }: any, info: any) => {
+			const { isAuth, userId } = req;
 			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
@@ -123,7 +126,7 @@ const resolvers = {
 				throw err;
 			}
 		},
-		createUser: async (_: any, { user }: any, ___: any) => {
+		createUser: async (_: any, { user }: any, { res }: CustomContext) => {
 			try {
 				const findUser = await User.findOne({ username: user.username });
 				if (findUser) {
@@ -136,11 +139,22 @@ const resolvers = {
 					password: hashedPass,
 				});
 				const result = await newUser.save();
-				const token = await jwt.sign(
-					{ userId: result._doc._id.toString(), username: user.username },
-					"secret-shak",
-					{ expiresIn: "1h" }
+				const token = createAccessToken({
+					id: result._doc._id.toString(),
+					username: user.username,
+				});
+
+				res.cookie(
+					"jid",
+					createRefreshToken({
+						id: result._doc._id.toString(),
+						username: user.username,
+					}),
+					{
+						httpOnly: true,
+					}
 				);
+
 				return {
 					...result._doc,
 					_id: result._doc._id.toString(),
@@ -153,7 +167,8 @@ const resolvers = {
 				throw err;
 			}
 		},
-		joinEvent: async (_: any, { eventId }: any, { isAuth, userId }: any) => {
+		joinEvent: async (_: any, { eventId }: any, { req }: any) => {
+			const { isAuth, userId } = req;
 			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}
@@ -173,7 +188,8 @@ const resolvers = {
 				throw err;
 			}
 		},
-		leaveEvent: async (_: any, { eventId }: any, { isAuth, userId }: any) => {
+		leaveEvent: async (_: any, { eventId }: any, { req }: any) => {
+			const { isAuth, userId } = req;
 			if (!isAuth) {
 				throw new Error("Unauthenticated");
 			}

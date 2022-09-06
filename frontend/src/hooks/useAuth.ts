@@ -8,10 +8,9 @@ interface IAuthRed {
 
 const useAuth = () => {
 	const data = useSelector((state: IAuthRed) => state.Auth);
-    const token = getJwtToken();
+	const token = getJwtToken();
 	const { userId } = data;
-
-    return {loggedIn: token ? true : false, userId, token}
+	return { loggedIn: token ? true : false, userId };
 };
 
 export default useAuth;

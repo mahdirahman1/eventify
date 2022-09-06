@@ -13,7 +13,7 @@ export default gql`
 		createUser(user: UserInput): User!
 		joinEvent(eventId: ID!): Event!
 		leaveEvent(eventId: ID!): Event!
-	}
+	} 
 
 	type AuthData {
 		userId: ID!

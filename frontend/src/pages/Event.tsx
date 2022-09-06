@@ -205,7 +205,7 @@ const Event = () => {
     }
 
 	return (
-		<Box m={5}>
+		<Box m={5} px={5}>
 			<Heading fontSize={"4xl"} my="8">
 				{`${data?.event.title}`}
 			</Heading>
@@ -249,7 +249,7 @@ const Event = () => {
                                 {`${new Date(data?.event.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}
                             </Box>
                             <Text my={5}>{`${data?.event.description}`}</Text>
-                            <Text>Hosted by {data?.event.host._id === userId ? `You` : `${data?.event.host.name}`}</Text>
+                            <Text>Hosted by {data?.event.host._id === userId ? `you` : `${data?.event.host.name}`}</Text>
                         </TabPanel>
 						<TabPanel>
                         <TableContainer>

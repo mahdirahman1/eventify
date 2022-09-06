@@ -48,7 +48,7 @@ const Login = () => {
 		() => {
 			if (data && !loading) {
 				//console.log(data);
-				dispatch({ type: "LOGIN_USER", payload: {token: data.login.token, tokenExp: data.login.tokenExp, userId: data.login.userId} });
+				dispatch({ type: "LOGIN_USER", payload: { userId: data.login.userId} });
 				setJwtToken(data.login.token);
 				navigate("/events", { replace: true })
 			}

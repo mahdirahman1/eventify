@@ -8,6 +8,7 @@ import NewEvent from "../pages/NewEvent";
 import MyEvents from "../pages/MyEvents";
 import Settings from "../pages/Settings";
 import Event from "../pages/Event";
+import EditEvent from "../pages/EditEvent";
 
 const createRoutes = () => {
 	return (
@@ -17,6 +18,7 @@ const createRoutes = () => {
 				<Route path="/my-events" element={<MyEvents />} />
 				<Route path="/settings" element={<Settings />} />
 				<Route path="/events/:id" element={<Event />} />
+				<Route path="/events/:id/edit" element={<EditEvent />} />
 			</Route>
 			<Route path="/events" element={<Events />} />
 			<Route path="/login" element={<Login />} />

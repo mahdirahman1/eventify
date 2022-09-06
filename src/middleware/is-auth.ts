@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import "dotenv/config"
 
 interface JwtPayload {
 	userId: string;
@@ -17,7 +18,10 @@ export default (req: any, res: any, next: any) => {
 	}
 	let decodedToken;
 	try {
-		decodedToken = jwt.verify(token, "secret-shak") as JwtPayload;
+		decodedToken = jwt.verify(
+			token,
+			`${process.env.ACCESS_TOKEN_SECRET}`
+		) as JwtPayload;
 	} catch {
 		req.isAuth = false;
 		return next();

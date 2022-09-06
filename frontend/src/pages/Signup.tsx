@@ -14,9 +14,9 @@ import {
 	Link,
 	FormErrorMessage,
 } from "@chakra-ui/react";
-import {  useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
 import { setJwtToken } from "../utils";
@@ -49,9 +49,7 @@ const Signup = () => {
 			dispatch({
 				type: "LOGIN_USER",
 				payload: {
-					token: data.createUser.token,
-					tokenExp: data.createUser.tokenExp,
-					userId: data.createUser.userId,
+					userId: data.createUser._id,
 				},
 			});
 			setJwtToken(data.createUser.token);
