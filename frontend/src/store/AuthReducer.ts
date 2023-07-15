@@ -18,6 +18,10 @@ const AuthReducer = (state = initialState, action: AnyAction) => {
 			state = action.payload;
 			break;
 
+		case "LOG_OUT":
+			state = action.payload;
+
+			break;
 		default:
 			return state;
 	}

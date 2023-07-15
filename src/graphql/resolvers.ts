@@ -28,6 +28,36 @@ const resolvers = {
 				throw err;
 			}
 		},
+		editEvent: async (_: any, { id }: any, { req }: any) => {
+			const { isAuth, userId } = req;
+			if (!isAuth) {
+				throw new Error("Unauthenticated");
+			}
+			try {
+				const events = await Event.find({ _id: id })
+					.populate({
+						path: "host",
+						populate: {
+							path: "hostedEvents",
+						},
+					})
+					.populate("participants");
+				const foundEvent = events[0];
+				
+				if (userId != foundEvent.host._id.toString()) {
+					throw new Error("Unauthorized");
+				}
+
+				return {
+					...foundEvent._doc,
+					_id: foundEvent._doc._id.toString(),
+					date: new Date(foundEvent._doc.date).toISOString(),
+				};
+			} catch (err) {
+				console.log(err);
+				throw err;
+			}
+		},
 		event: async (_: any, { id }: any, { req }: any) => {
 			const { isAuth } = req;
 			if (!isAuth) {
@@ -100,6 +130,10 @@ const resolvers = {
 				console.log(err);
 				throw err;
 			}
+		},
+		logout: async (_: any, __: any, { res }: CustomContext) => {
+			res.clearCookie("jid");
+			return { success: true };
 		},
 	},
 
@@ -209,6 +243,40 @@ const resolvers = {
 					...event._doc,
 					_id: event._doc._id.toString(),
 					date: new Date(event._doc.date).toISOString(),
+				};
+			} catch (err) {
+				console.log(err);
+				throw err;
+			}
+		},
+		updateEvent: async (_: any, { eventId, event }: any, { req }: any) => {
+			const { isAuth, userId } = req;
+			if (!isAuth) {
+				throw new Error("Unauthenticated");
+			}
+			try {
+				const updatedEvent = new Event({
+					...event,
+					date: new Date(event.date).toISOString(),
+					host: userId,
+				});
+				 await Event.updateOne({ _id: eventId }, {
+					$set: {
+						title: event.title,
+						date: event.date,
+						category: event.category,
+						description: event.description
+						
+					}
+				});
+				
+				let updated = await Event.findById(eventId);
+				updated = await updated.populate("host");
+				updated = await updated.populate("participants");
+				return {
+					...updated._doc,
+					_id: updated._doc._id.toString(),
+					date: new Date(updated._doc.date).toISOString(),
 				};
 			} catch (err) {
 				console.log(err);

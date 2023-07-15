@@ -23,7 +23,6 @@ const ALL_EVENTS = gql`
 	}
 `;
 const Events = () => {
-	const navigate = useNavigate();
 	const [ getEvents, {loading, error, data}] = useLazyQuery<any>(ALL_EVENTS);
 
 	useEffect(() => {

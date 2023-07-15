@@ -4,12 +4,10 @@ import {
 	Badge,
 	Box,
 	Button,
-	FormErrorMessage,
 	Heading,
 	SimpleGrid,
 	Tab,
 	Table,
-	TableCaption,
 	TableContainer,
 	TabList,
 	TabPanel,
@@ -18,7 +16,6 @@ import {
     Tbody,
     Td,
     Text,
-	Tfoot,
 	Th,
 	Thead,
 	Tr,
@@ -92,6 +89,7 @@ const LEAVE = gql`
 
 const Event = () => {
 	const { id } = useParams();
+	const navigate = useNavigate();
     const userId: String | null = useSelector(
 		(state: RootState) => state.Auth.userId
 	);
@@ -128,7 +126,8 @@ const Event = () => {
 		},
 		[getEvent]
 	);
-
+	
+	
 	const joinHandler =	async () => {
 		await joinEvent({
 			variables: {
@@ -158,7 +157,7 @@ const Event = () => {
             loadingText="Leaving"
 			isLoading={loadLeave}
             type="submit"
-			onClick={leaveHandler}
+			onClick={() => navigate(`edit`, { replace: true })}
             
         >
             Edit Event

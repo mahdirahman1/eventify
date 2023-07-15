@@ -14,6 +14,8 @@ import NavItem from "./NavItem";
 import MobileNav from "./MobileNav";
 import { unauthItems, authenticatedItems } from "./config";
 import useAuth from "../../hooks/useAuth";
+import { authState } from "../../store/AuthReducer";
+import { useSelector } from "react-redux";
 
 const Navbar = ({ children }: { children: ReactNode }) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -48,9 +50,15 @@ interface SidebarProps extends BoxProps {
 	onClose: () => void;
 }
 
+interface IAuthRed {
+	Auth: authState;
+}
+
+
 const SideBarContent = ({ onClose, ...rest }: SidebarProps) => {
-	const { loggedIn } = useAuth();
-	const links = loggedIn ? authenticatedItems : unauthItems;
+	const data = useSelector((state: IAuthRed) => state.Auth);
+	const { userId } = data;
+	const links = userId ? authenticatedItems : unauthItems;
 	return (
 		<Box
 			bg={useColorModeValue("white", "gray.900")}

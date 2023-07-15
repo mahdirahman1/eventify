@@ -4,8 +4,10 @@ export default gql`
 	type Query {
 		events: [Event!]!
 		event(id: ID!): Event!
+		editEvent(id: ID!): Event!
 		user(id: ID!): User!
 		login(username: String!, password: String): AuthData!
+		logout: LogOut!
 	}
 
 	type Mutation {
@@ -13,7 +15,12 @@ export default gql`
 		createUser(user: UserInput): User!
 		joinEvent(eventId: ID!): Event!
 		leaveEvent(eventId: ID!): Event!
+		updateEvent(eventId: ID!, event: EventInput!): Event!
 	} 
+
+	type LogOut {
+		success: String!
+	}
 
 	type AuthData {
 		userId: ID!
