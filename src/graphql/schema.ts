@@ -5,6 +5,7 @@ export default gql`
 		events: [Event!]!
 		event(id: ID!): Event!
 		editEvent(id: ID!): Event!
+		deleteEvent(id: ID!): Event!
 		user(id: ID!): User!
 		login(username: String!, password: String): AuthData!
 		logout: LogOut!

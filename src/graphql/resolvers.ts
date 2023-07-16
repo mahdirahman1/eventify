@@ -43,10 +43,45 @@ const resolvers = {
 					})
 					.populate("participants");
 				const foundEvent = events[0];
-				
+
 				if (userId != foundEvent.host._id.toString()) {
 					throw new Error("Unauthorized");
 				}
+
+				return {
+					...foundEvent._doc,
+					_id: foundEvent._doc._id.toString(),
+					date: new Date(foundEvent._doc.date).toISOString(),
+				};
+			} catch (err) {
+				console.log(err);
+				throw err;
+			}
+		},
+		deleteEvent: async (_: any, { id }: any, { req }: any) => {
+			const { isAuth, userId } = req;
+			if (!isAuth) {
+				throw new Error("Unauthenticated");
+			}
+			try {
+				const events = await Event.find({ _id: id })
+					.populate({
+						path: "host",
+						populate: {
+							path: "hostedEvents",
+						},
+					})
+					.populate("participants");
+				const foundEvent = events[0];
+				if (!foundEvent) {
+					throw new Error("Event not found");
+				}
+
+				if (userId != foundEvent.host._id.toString()) {
+					throw new Error("Unauthorized");
+				}
+
+				await Event.deleteOne({ _id: id });
 
 				return {
 					...foundEvent._doc,
@@ -260,16 +295,18 @@ const resolvers = {
 					date: new Date(event.date).toISOString(),
 					host: userId,
 				});
-				 await Event.updateOne({ _id: eventId }, {
-					$set: {
-						title: event.title,
-						date: event.date,
-						category: event.category,
-						description: event.description
-						
+				await Event.updateOne(
+					{ _id: eventId },
+					{
+						$set: {
+							title: event.title,
+							date: event.date,
+							category: event.category,
+							description: event.description,
+						},
 					}
-				});
-				
+				);
+
 				let updated = await Event.findById(eventId);
 				updated = await updated.populate("host");
 				updated = await updated.populate("participants");

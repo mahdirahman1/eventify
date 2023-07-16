@@ -9,14 +9,16 @@ import {
 	MenuItem,
 	MenuList,
 	useColorModeValue,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import DeleteDialog from "./DeleteDialog";
 
-const Card = ({ eventInfo, edit }: any) => {
+const Card = ({ eventInfo, edit, getUserEvents }: any) => {
 	const { _id: id, category, title, participants, host, date } = eventInfo;
 	const formattedDate = new Date(date);
 	const navigate = useNavigate();
-
+	const { isOpen, onOpen, onClose } = useDisclosure();
 	return (
 		<Box
 			maxW="sm"
@@ -90,19 +92,29 @@ const Card = ({ eventInfo, edit }: any) => {
 						fontSize="sm"
 					>
 						<Menu>
-							<MenuButton
-								as={IconButton}
-								aria-label="Options"
-								icon={<HamburgerIcon />}
-								variant="outline"
-							/>
-							<MenuList>
-								<MenuItem icon={<EditIcon />}>Edit</MenuItem>
-								<MenuItem icon={<DeleteIcon />}>Delete</MenuItem>
-							</MenuList>
+							<Box onClick={(e) => e.stopPropagation()}>
+								<MenuButton
+									as={IconButton}
+									aria-label="Options"
+									icon={<HamburgerIcon />}
+									variant="outline"
+								/>
+								<MenuList>
+									<MenuItem
+										icon={<EditIcon />}
+										onClick={() => navigate(`/events/${id}`)}
+									>
+										Edit
+									</MenuItem>
+									<MenuItem icon={<DeleteIcon />} onClick={onOpen}>
+										Delete
+									</MenuItem>
+								</MenuList>
+							</Box>
 						</Menu>
 					</Box>
 				)}
+				<DeleteDialog isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} getUserEvents={getUserEvents} />
 			</Box>
 		</Box>
 	);

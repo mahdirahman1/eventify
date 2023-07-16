@@ -141,7 +141,7 @@ const EditEvent = () => {
 					: catRef.current.value,
 			description: descRef.current.value,
 		};
-		console.log(event);
+
 		await updateEvent({
 			variables: {
 				eventId: id,
