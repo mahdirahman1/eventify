@@ -16,6 +16,7 @@ import {
 	useMediaQuery,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CREATE_EVENT = gql`
 	mutation Mutation($event: EventInput) {
@@ -27,8 +28,10 @@ const CREATE_EVENT = gql`
 `;
 
 const NewEvent = () => {
+	const navigate = useNavigate();
 	let [createEvent, { loading, reset }] = useMutation(CREATE_EVENT, {
 		onCompleted: (data) => {
+			navigate("/events");
 			reset();
 			resetFields();
 		},

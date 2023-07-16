@@ -54,7 +54,6 @@ interface IAuthRed {
 	Auth: authState;
 }
 
-
 const SideBarContent = ({ onClose, ...rest }: SidebarProps) => {
 	const data = useSelector((state: IAuthRed) => state.Auth);
 	const { userId } = data;
@@ -71,7 +70,7 @@ const SideBarContent = ({ onClose, ...rest }: SidebarProps) => {
 		>
 			<Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
 				<Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-					EventApp
+					Eventify
 				</Text>
 				<CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
 			</Flex>
