@@ -31,15 +31,7 @@ app.use((req, res, next) => {
 	}
 	next();
 });
-app.use(
-	cors({
-		origin: [
-			"https://eventify-client-three.vercel.app/",
-			"https://studio.apollographql.com",
-		],
-		credentials: true,
-	})
-);
+
 app.use(cookieParser());
 app.post("/refresh_token", async (req, res) => {
 	const token = req.cookies.jid;
@@ -87,13 +79,6 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 	await server.start();
 	server.applyMiddleware({
 		app,
-		cors: {
-			origin: [
-				"https://eventify-client-three.vercel.app/",
-				"https://studio.apollographql.com",
-			],
-			credentials: true,
-		},
 	});
 }
 
