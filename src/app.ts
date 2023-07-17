@@ -19,6 +19,18 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${
 }@cluster0.2rle2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader(
+		"Access-Control-Allow-Methods",
+		"OPTIONS, GET, POST, PUT, PATCH, DELETE"
+	);
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+	if (req.method === "OPTIONS") {
+		return res.sendStatus(200);
+	}
+	next();
+});
 app.use(
 	cors({
 		origin: [
