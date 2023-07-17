@@ -21,7 +21,10 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${
 app.use(bodyParser.json());
 app.use(
 	cors({
-		origin: ["http://localhost:3000/login", "https://studio.apollographql.com"],
+		origin: [
+			"https://eventify-client-three.vercel.app/",
+			"https://studio.apollographql.com",
+		],
 		credentials: true,
 	})
 );
@@ -74,7 +77,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 		app,
 		cors: {
 			origin: [
-				"http://localhost:3000/login",
+				"https://eventify-client-three.vercel.app/",
 				"https://studio.apollographql.com",
 			],
 			credentials: true,
