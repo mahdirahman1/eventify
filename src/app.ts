@@ -21,7 +21,7 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${
 app.use(bodyParser.json());
 app.use(
 	cors({
-		origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+		origin: ["https://studio.apollographql.com"],
 		credentials: true,
 	})
 );
@@ -73,7 +73,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 	server.applyMiddleware({
 		app,
 		cors: {
-			origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+			origin: ["https://studio.apollographql.com"],
 			credentials: true,
 		},
 	});
