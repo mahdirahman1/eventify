@@ -23,14 +23,18 @@ const user_1 = __importDefault(require("./models/user"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("./graphql/auth");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.2rle2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 app.use(body_parser_1.default.json());
-app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "https://studio.apollographql.com"],
-    credentials: true,
-}));
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, PATCH, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+    next();
+});
 app.use((0, cookie_parser_1.default)());
 app.post("/refresh_token", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.cookies.jid;
@@ -73,10 +77,6 @@ function startApolloServer(typeDefs, resolvers) {
         yield server.start();
         server.applyMiddleware({
             app,
-            cors: {
-                origin: ["http://localhost:3000", "https://studio.apollographql.com"],
-                credentials: true,
-            },
         });
     });
 }
@@ -86,7 +86,7 @@ mongoose_1.default
     .connect(uri)
     .then(() => {
     console.log("db connected");
-    app.listen({ port: 4000 }, () => console.log(`🚀 Server ready at http://localhost:4000`));
+    app.listen({ port: process.env.PORT || 4000 }, () => console.log(`🚀 Server ready at http://localhost:4000`));
 })
     .catch((err) => {
     console.log(err);
